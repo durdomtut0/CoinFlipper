@@ -68,6 +68,7 @@ const provider = new ethers.providers.Web3Provider(window.ethereum, 97)//ChainID
 let signer;
 let contract;
 
+
 const event = "CoinFlipped";
 
 provider.send("eth_requestAccounts", []).then(()=>{
@@ -79,6 +80,7 @@ provider.send("eth_requestAccounts", []).then(()=>{
             contractABI,
             signer
         )
+     
     }
     )
 }
@@ -89,13 +91,57 @@ async function flipCoin(_option){
     let amountInWei = ethers.utils.parseEther(amountInEth.toString())
     console.log(amountInWei);
     
-    let result = await contract.coinFlip(_option, {value: amountInWei});
-    const res = await result.wait();
+    let resultOfCoinFlip = await contract.coinFlip(_option, {value: amountInWei});
+    const res = await resultOfCoinFlip.wait();
     console.log(res);
-    console.log( await contract.filters.CoinFlipped());
-    console.log( contract.on("CoinFlipped", ) )
-    document.getElementById("amountInEth").innerText = res;
+    //console.log( await res.events[0].args.player.toString());
+
+    let queryResult =  await contract.queryFilter('CoinFlipped', await provider.getBlockNumber() - 10000, await provider.getBlockNumber());
+    let queryResultRecent = queryResult[queryResult.length-1]
+    //console.log(queryResult[queryResult.length-1].args);
+
+    let amount = await queryResultRecent.args.amount.toString();
+    let player = await queryResultRecent.args.player.toString();
+    let option = await queryResultRecent.args.option.toString();
+    let result = await queryResultRecent.args.result.toString();
+
+    let resultLogs = `
+    stake amount: ${ethers.utils.formatEther(amount.toString())} BNB, 
+    player: ${player}, 
+    player chose: ${option ==0 ? "HEAD": "TAIL"}, 
+    result: ${result == false ? "LOSE 😥": "WIN 🎉"}`;
+    console.log(resultLogs);
+
+    let resultLog = document.getElementById("resultLog");
+    resultLog.innerText = resultLogs;
+
+    handleEvent();
 }
+
+async function handleEvent(){
+
+    //console.log(await contract.filters.CoinFlipped());
+    let queryResult =  await contract.queryFilter('CoinFlipped', await provider.getBlockNumber() - 10000, await provider.getBlockNumber());
+    let queryResultRecent = queryResult[queryResult.length-1]
+    let amount = await queryResultRecent.args.amount.toString();
+    let player = await queryResultRecent.args.player.toString();
+    let option = await queryResultRecent.args.option.toString();
+    let result = await queryResultRecent.args.result.toString();
+
+    let resultLogs = `
+    stake amount: ${ethers.utils.formatEther(amount.toString())} BNB, 
+    player: ${player}, 
+    player chose: ${option ==0 ? "HEAD": "TAIL"}, 
+    result: ${result == false ? "LOSE 😥": "WIN 🎉"}`;
+    console.log(resultLogs);
+
+    let resultLog = document.getElementById("resultLog");
+    resultLog.innerText = resultLogs;
+    
+}
+
+
+
 
 
 

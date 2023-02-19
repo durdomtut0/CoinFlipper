@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoinFlipper Dapp</title>
     <link rel = "stylesheet" href = "style.css">
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+    <script src="https://cdn.ethers.io/lib/ethers-5.4.umd.min.js"
         type="application/javascript"></script>
     <script src = "script.js"></script>
 
@@ -18,7 +18,9 @@
         <input type="number" min = "0" id = "amountInEth">
         <button onclick="flipCoin(0)">HEAD</button>
         <button onclick="flipCoin(1)">TAIL</button>
-        <p>Result <span id="result"></p>
+
+        <button onclick="handleEvent()">event</button>
+        <p><b>Result:</b> <span id="resultLog"></p>
 
     </div>
     
